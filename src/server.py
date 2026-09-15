@@ -25,18 +25,28 @@ def start_server(arg_host, arg_port):
             print("[+] Server initialized its own keys and recieved client keys")
             print("[+] Sending ACK")
 
+            #--------AES key exchange--------
+            aes_key_string = NODE.unpack_and_decrypt()
+            aes_key = bytes.fromhex(aes_key_string)
+            print("[*] AES key recieved...established secure session")
+            print("Starting Chat")
+
             try:
                 while True:
-                
-                    data = NODE.unpack_and_decrypt()
-                    if not data:
-                        print("\n[-] Client disconnected.")
-                        break
-                    print(f"[Client]: {data}")
 
-                    message = input("[You]: ")
-                    print("[*] Waiting for the message...")
-                    NODE.pack_and_encrypt(message)
+                    #--------message recieve--------
+                    data_recv = NODE.aes_unpack_and_decrypt(aes_key)
+                    if not data_recv:
+                        print("\n[-] Cient disconnected.")
+                        break
+                    print(f"[Client]: {data_recv}")
+
+                    #--------message send--------
+                    message = input("[YOU]: ")
+                    if not message:
+                        continue
+                    NODE.aes_pack_and_encrypt(message, aes_key)
+                    
 
             except KeyboardInterrupt:
                 print("\n[!] keyboard interrupt. exiting now...")

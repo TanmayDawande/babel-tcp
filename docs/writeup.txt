@@ -53,3 +53,21 @@ BUG - if a message more than 256 bit is sent, an overflow error is caused due to
 FIX - babel will use a hybrid cryptography model in the futire commits. RSA will only be used duing handshake and after that 
 once a session is established, the actual chat stream will be encrypted using AES-GCM, which has no payload limit.
 
+-------------------------------------------------------
+AES - GCM (Advanced Encryption Standard in Galois/Counter Mode)
+
+ECB mode in the AES scheme uses only one block cypher to take in plaintext and spit out cyphertext. It is very weak.
+Counter mode uses a random initializer to ensure that the encryption scheme is different everytime. You encrypt the counter not the message. We will XOR
+the actual message with this encrypted counter and get cyphertext 1(c1) to cn. Now this is risky. If an attacker gets hold of the cyphertext,
+they can change the bits and when the message is drcrypted, it will alter the message content itself. We need to add something like a checksum to ensure
+that the CT hasnt been tampered with. We could define a tag that will change even if one of the C1-Cn changes (cyphertext). We want to authenticate the
+cyphertext, obv. We also want to authenticate the length of the message against the tag. aes-gcm first calculates the hash key first.
+-To generate this, 128 0s and we encryot that using aes, that gives us H, the hash key
+-For each cyphertext, we add it to your existing tag, multiply it to H (We use finite field arithmetic in the Galois field..too complex for me to explain)
+
+Object-Oriented Refactoring (SecureNODE)
+To clean up the codebase and make it scalable, all the messy networking plumbing (struct packing/unpacking) and the math (RSA/AES) was moved into a dedicated SecureNODE class.
+The client and server files now just handle the UI and the socket lifecycle. They create a SecureNODE object, pass the socket into it, and just call clean functions like NODE.aes_pack_and_encrypt(). 
+This keeps the state (like the specific keys for that session) isolated inside the object.
+-
+
