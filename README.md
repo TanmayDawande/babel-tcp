@@ -1,10 +1,10 @@
 # babel
 
-A TCP chat protocol built from raw sockets, with RSA and AES-GCM bolted on by hand instead of imported from a TLS library.
+A TCP chat protocol built from python sockets, with RSA used for establishing an AES-GCM session.  RSA encryption implemented from raw math rather than importing a library.
 
 ## What this is
 
-Started as a plain socket chat script and turned into a small cryptography project. Instead of wrapping the connection in TLS, the goal was to build the handshake myself: generate real RSA keypairs, do the modular exponentiation by hand, use that to bootstrap a proper AES-256-GCM session, and see where a hand-rolled protocol actually breaks.
+Started as a plain socket chat script and turned into a small cryptography project. Instead of wrapping the connection in TLS, the goal was to build the handshake myself: generate real RSA keypairs, do the modular exponentiation by hand, use that to bootstrap a proper AES-256-GCM session, and see where the protocol actually breaks.
 
 It broke a few times. That's mostly the point.
 
@@ -24,7 +24,7 @@ Client                              Server
 3. **Session key.** The client generates a random 256-bit AES key, encrypts it under the server's RSA public key, and sends it once. From that point on both sides share a symmetric key that was never sent as plaintext.
 4. **Transport.** Chat messages are encrypted with AES-256-GCM: a fresh random nonce per message, shipped as `nonce || tag || ciphertext`. The GCM tag means a tampered packet gets rejected instead of silently decrypting into garbage.
 
-All of this lives in `SecureNODE`, a class that wraps a raw socket and exposes clean methods (`sendHandshake`, `aes_pack_and_encrypt`, etc.), so `client.py` and `server.py` only deal with UI and connection lifecycle, not the math.
+All of this lives in `SecureNODE`, a class that wraps a raw socket and exposes clean methods so `client.py` and `server.py` only deal with UI and connection lifecycle, not the math.
 
 ## Running it
 
@@ -42,8 +42,8 @@ python src/client.py --host 127.0.0.1 --port 65432
 
 ## Known limitations
 
-- The RSA handshake uses raw modular exponentiation with no OAEP padding. Good for learning the math, not something to point at the real internet.
-- Public keys are exchanged with no way to verify identity, so an active attacker sitting on the handshake can still substitute their own key. Same problem every unauthenticated key exchange has without a trust anchor.
+- The RSA handshake uses raw modular exponentiation with no OAEP padding.
+- MITM attacks can be carried out easily with the interceptor exchanging their own keys. No way to authenticate identity yet
 - The chat loop is a strict send-then-receive ping-pong, no threading yet, so you can't type while waiting on the other side.
 - One client, one server, one connection at a time.
 
