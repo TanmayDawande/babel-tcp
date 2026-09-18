@@ -4,10 +4,24 @@ import argparse
 import os
 from secure_node import SecureNODE
 
+ASCII_ART = """
+▀█████████▄     ▄████████ ▀█████████▄     ▄████████  ▄█       
+  ███    ███   ███    ███   ███    ███   ███    ███ ███       
+  ███    ███   ███    ███   ███    ███   ███    █▀  ███       
+ ▄███▄▄▄██▀    ███    ███  ▄███▄▄▄██▀   ▄███▄▄▄     ███       
+▀▀███▀▀▀██▄  ▀███████████ ▀▀███▀▀▀██▄  ▀▀███▀▀▀     ███       
+  ███    ██▄   ███    ███   ███    ██▄   ███    █▄  ███       
+  ███    ███   ███    ███   ███    ███   ███    ███ ███▌    ▄ 
+▄█████████▀    ███    █▀  ▄█████████▀    ██████████ █████▄▄██ 
+                                                    ▀         
+"""
 
 def start_client(arg_host, arg_port):
     host = arg_host
     port = arg_port
+
+    print(ASCII_ART)
+
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
         try:
             client_socket.connect((host, port))
@@ -30,8 +44,8 @@ def start_client(arg_host, arg_port):
         aes_key = os.urandom(32)
         aes_key_str = aes_key.hex()
         NODE.pack_and_encrypt(aes_key_str)
-        print("[+] AES key established for this session...sending now")
-        print("Starting Chat")
+        print("[+] AES key established for this session... sending now")
+        print("\n=== Starting Chat ===\n")
 
         try:
             while True:
@@ -50,10 +64,10 @@ def start_client(arg_host, arg_port):
                 print(f"[Server]: {data_recv}")
 
         except KeyboardInterrupt:
-            print("\n[!] keyboard interrupt detected. exiting now...")
+            print("\n[!] Keyboard interrupt detected. Exiting now...")
 
         except ConnectionResetError:
-            print("\n[-] connection closed by client. exiting...")
+            print("\n[-] Connection closed by client. Exiting...")
 
     print("[*] Connection closed")
 
@@ -64,5 +78,6 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, default=65432, help="Port to listen on")
 
     args = parser.parse_args()
+    
     os.system('cls' if os.name == 'nt' else 'clear')
     start_client(args.host, args.port)

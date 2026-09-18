@@ -3,10 +3,23 @@ import argparse
 import os
 from secure_node import SecureNODE
 
+ASCII_ART = """
+▀█████████▄     ▄████████ ▀█████████▄     ▄████████  ▄█       
+  ███    ███   ███    ███   ███    ███   ███    ███ ███       
+  ███    ███   ███    ███   ███    ███   ███    █▀  ███       
+ ▄███▄▄▄██▀    ███    ███  ▄███▄▄▄██▀   ▄███▄▄▄     ███       
+▀▀███▀▀▀██▄  ▀███████████ ▀▀███▀▀▀██▄  ▀▀███▀▀▀     ███       
+  ███    ██▄   ███    ███   ███    ██▄   ███    █▄  ███       
+  ███    ███   ███    ███   ███    ███   ███    ███ ███▌    ▄ 
+▄█████████▀    ███    █▀  ▄█████████▀    ██████████ █████▄▄██ 
+                                                    ▀         
+"""
 
 def start_server(arg_host, arg_port):
     host = arg_host
     port = arg_port
+
+    print(ASCII_ART)
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
         server_socket.bind((host, port))
@@ -28,8 +41,8 @@ def start_server(arg_host, arg_port):
             #--------AES key exchange--------
             aes_key_string = NODE.unpack_and_decrypt()
             aes_key = bytes.fromhex(aes_key_string)
-            print("[*] AES key recieved...established secure session")
-            print("Starting Chat")
+            print("[*] AES key recieved... established secure session")
+            print("\n=== Starting Chat ===\n")
 
             try:
                 while True:
@@ -37,7 +50,7 @@ def start_server(arg_host, arg_port):
                     #--------message recieve--------
                     data_recv = NODE.aes_unpack_and_decrypt(aes_key)
                     if not data_recv:
-                        print("\n[-] Cient disconnected.")
+                        print("\n[-] Client disconnected.")
                         break
                     print(f"[Client]: {data_recv}")
 
@@ -47,12 +60,11 @@ def start_server(arg_host, arg_port):
                         continue
                     NODE.aes_pack_and_encrypt(message, aes_key)
                     
-
             except KeyboardInterrupt:
-                print("\n[!] keyboard interrupt. exiting now...")
+                print("\n[!] Keyboard interrupt. Exiting now...")
 
             except ConnectionResetError:
-                print("\n[-] connection was forcebly closed by the remote host")
+                print("\n[-] Connection was forcibly closed by the remote host")
 
     print("[*] Connection Closed")
 
