@@ -1,5 +1,7 @@
 # babel
 
+**[read the full technical write-up here :)](https://tanmaydawande.tech/blog/2026-09-18-babel-tcp.html)** 
+
 A TCP chat protocol built from python sockets, with RSA used for establishing an AES-GCM session.  RSA encryption implemented from raw math rather than importing a library.
 
 ## What this is
