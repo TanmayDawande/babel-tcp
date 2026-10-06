@@ -1,22 +1,23 @@
 import math
-import rsa_encrypt
+import oaep
 import os
 from Crypto.Cipher import AES
 
 def generate_cyphertext(message, N, e):
-    message_bytes = message.encode('utf-8')
-    M = int.from_bytes(message_bytes, byteorder='big')
+    padded_bytes = oaep.oaep_pad(message, 256)
+    M = int.from_bytes(padded_bytes, byteorder='big')
     # print(f"{pow(M, e, N)}") debugging
-    return f"{pow(M, e, N)}"
+    C = pow(M, e, N)
+    return C.to_bytes(256, byteorder='big')
 
-def decrypt(C, N, d):
-    C = int(C)
+
+def decrypt(Ciphertext_bytes, N, d):
+    C = int.from_bytes(Ciphertext_bytes, byteorder='big')
     # print(C) debugging 
     M_decrypted = pow(C, d, N)
-    bit_length = math.ceil(M_decrypted.bit_length() / 8)
-    #this calculates the bytelehgth which is needed in the to_bytes
-    decrypt_bytes = M_decrypted.to_bytes(bit_length, byteorder="big")
-    return decrypt_bytes.decode('utf-8')
+    padded_box = M_decrypted.to_bytes(256, byteorder='big')
+    original_message_bytes = oaep.oaep_unpad(padded_box)
+    return original_message_bytes
 
 def encrypt_aes(message, aes_key):
     message = message.encode('utf-8')

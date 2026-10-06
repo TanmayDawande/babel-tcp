@@ -42,8 +42,7 @@ def start_client(arg_host, arg_port):
 
         #--------AES key exchange--------
         aes_key = os.urandom(32)
-        aes_key_str = aes_key.hex()
-        NODE.pack_and_encrypt(aes_key_str)
+        NODE.pack_and_encrypt(aes_key)
         print("[+] AES key established for this session... sending now")
         print("\n=== Starting Chat ===\n")
 

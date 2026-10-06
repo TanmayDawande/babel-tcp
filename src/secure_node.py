@@ -2,6 +2,7 @@ import struct
 import rsa_encrypt as rsae
 import crypto_engine as cr
 import sys
+import oaep as oaep
 
 class SecureNODE:
     def __init__(self, socket):
@@ -46,7 +47,7 @@ class SecureNODE:
 
     def pack_and_encrypt(self, message : str):
         cyphertext_msg = cr.generate_cyphertext(message, self.your_N, self.your_e)
-        self.socket.sendall(self._pack(cyphertext_msg))
+        self.socket.sendall(self._pack_bytes(cyphertext_msg))
         
     def unpack_and_decrypt(self):
         header = self.socket.recv(4)

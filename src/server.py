@@ -39,8 +39,7 @@ def start_server(arg_host, arg_port):
             print("[+] Sending ACK")
 
             #--------AES key exchange--------
-            aes_key_string = NODE.unpack_and_decrypt()
-            aes_key = bytes.fromhex(aes_key_string)
+            aes_key = NODE.unpack_and_decrypt()
             print("[*] AES key recieved... established secure session")
             print("\n=== Starting Chat ===\n")
 
