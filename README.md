@@ -2,6 +2,8 @@
 
 **[read the full technical write-up here :)](https://tanmaydawande.tech/blog/2026-09-18-babel-tcp.html)**
 
+![babel demo](docs/demo.gif)
+
 A TCP chat protocol built from python sockets, with RSA used for establishing an AES-GCM session. The RSA math (key generation arithmetic, modular exponentiation) and the OAEP padding are written by hand. The only library pieces are pycryptodome's prime generator and AES-GCM.
 
 ## What this is
