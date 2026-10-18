@@ -3,6 +3,12 @@ import sys
 import argparse
 import os
 from secure_node import SecureNODE
+from datetime import datetime
+
+GREEN = "\033[32m"
+BLUE = "\033[34m"
+RESET = "\033[0m"
+
 
 ASCII_ART = """
 ▀█████████▄     ▄████████ ▀█████████▄     ▄████████  ▄█       
@@ -50,7 +56,9 @@ def start_client(arg_host, arg_port):
             while True:
 
                 #--------message send--------
-                message = input("[YOU]: ")
+                message = input(f"{GREEN}[YOU]: {RESET}")
+                timestamp = datetime.now().strftime("%I:%M:%S %p")
+                print(f"\033[A\r\033[K[{timestamp}]{GREEN} [YOU]:{RESET} {message}")
                 if not message:
                     continue
                 NODE.aes_pack_and_encrypt(message, aes_key)
@@ -60,7 +68,9 @@ def start_client(arg_host, arg_port):
                 if not data_recv:
                     print("\n[-] Server disconnected.")
                     break
-                print(f"[Server]: {data_recv}")
+
+                timestamp = datetime.now().strftime("%I:%M:%S %p")
+                print(f"[{timestamp}]{BLUE} [SERVER]:{RESET} {data_recv}")
 
         except KeyboardInterrupt:
             print("\n[!] Keyboard interrupt detected. Exiting now...")
