@@ -39,6 +39,7 @@ src/
   crypto_engine.py        RSA encrypt/decrypt around OAEP, AES-GCM helpers
   oaep.py                 OAEP padding (SHA-256, MGF1) from scratch
   rsa_encrypt.py          RSA key generation
+  chat_loop.py            Full-duplex asyncio UI and task management
 docs/writeup.txt          the math, worked out by hand
 ```
 
@@ -63,7 +64,7 @@ python src/client.py --host 127.0.0.1 --port 65432
 - RSA and OAEP are hand-written for learning. They aren't constant-time and haven't been audited, so don't use this to protect anything real.
 - Reads use a single `recv()` per frame, so on a real network a frame could arrive split. Fine on localhost, needs a read-until-complete loop.
 - A tampered or malformed packet ends the session with a traceback instead of closing cleanly.
-- The chat loop is a strict send-then-receive ping-pong, no threading yet, so you can't type while waiting on the other side. An empty message on the server side stalls both ends.
+- Because input() is a blocking OS call, if the remote node disconnects while you are typing, the background tasks will cancel but the terminal will hang waiting for your final Enter keystroke before fully exiting.
 - RSA keygen can very rarely fail at startup (about 1 run in 33,000) when 65537 shares a factor with the totient. Just rerun.
 - One client, one server, one connection at a time.
 
@@ -71,7 +72,6 @@ python src/client.py --host 127.0.0.1 --port 65432
 
 - Authenticate the handshake (signatures, which would finally use the client's keypair, or pinned key fingerprints) so a MITM can't swap keys
 - Swap the static RSA session key for ECDH, so one compromised session doesn't compromise the ones before it
-- Thread the chat loop for real full-duplex messaging
 - Multi-client support on the server
 
 The full math (Euler's totient, why the tag in AES-GCM matters, why RSA overflowed on longer messages before AES came in) is worked out by hand in `docs/writeup.txt`.
